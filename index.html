@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>活动列表自查清单 · 美本申请</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1814;
+    --ink-2: #4a4640;
+    --ink-3: #8a8580;
+    --ink-4: #c4c0bb;
+    --paper: #faf8f4;
+    --paper-2: #f2ede6;
+    --paper-3: #e8e2d8;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0eb;
+    --accent-mid: #4a8c60;
+    --warn: #8b3a1a;
+    --warn-light: #f5ece7;
+    --amber: #7a5c1a;
+    --amber-light: #f5eedc;
+    --purple: #3d3080;
+    --purple-light: #edeaf8;
+    --rule: #d8d2c8;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 16px;
+  }
+
+  .title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+
+  .title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.8;
+    max-width: 520px;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    margin-bottom: 40px;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .progress-count {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .progress-pct {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    transition: color .3s;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--paper-3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 36px 0 14px;
+  }
+
+  .section-label-text {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: .02em;
+  }
+
+  .tag-desc  { background: var(--accent-light); color: var(--accent); }
+  .tag-order { background: var(--purple-light); color: var(--purple); }
+  .tag-logic { background: var(--warn-light);   color: var(--warn);   }
+  .tag-match { background: var(--amber-light);  color: var(--amber);  }
+
+  /* ── Checklist item ── */
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border: 1px solid var(--paper-3);
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .1s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .item:hover { border-color: var(--paper-3); background: var(--paper-2); }
+  .item:active { transform: scale(.995); }
+
+  .item.checked {
+    background: var(--accent-light);
+    border-color: #b8d4c0;
+  }
+
+  .item-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-3);
+    margin-top: 2px;
+    transition: all .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .item.checked .item-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .item-num-text { transition: opacity .15s; }
+  .item-num-check {
+    position: absolute;
+    opacity: 0;
+    transition: opacity .15s;
+    font-size: 12px;
+  }
+
+  .item.checked .item-num-text { opacity: 0; }
+  .item.checked .item-num-check { opacity: 1; }
+
+  .item-body { flex: 1; min-width: 0; }
+
+  .item-q {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.55;
+    margin-bottom: 4px;
+  }
+
+  .item.checked .item-q { color: var(--accent); }
+
+  .item-hint {
+    font-size: 12.5px;
+    color: var(--ink-3);
+    line-height: 1.65;
+  }
+
+  .item.checked .item-hint { color: #5a8a6a; }
+
+  /* ── Score card ── */
+  .score-card {
+    margin-top: 36px;
+    padding: 22px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--rule);
+    background: var(--paper-2);
+    transition: background .4s, border-color .4s;
+    min-height: 90px;
+  }
+
+  .score-card.green  { background: var(--accent-light); border-color: #b8d4c0; }
+  .score-card.yellow { background: var(--amber-light);  border-color: #dfc98a; }
+  .score-card.red    { background: var(--warn-light);   border-color: #e8b8a0; }
+
+  .score-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+    transition: color .3s;
+  }
+
+  .score-card.green  .score-label { color: var(--accent); }
+  .score-card.yellow .score-label { color: var(--amber); }
+  .score-card.red    .score-label { color: var(--warn); }
+
+  .score-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .score-body {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.75;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.7;
+  }
+
+  .footer-note strong {
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  /* ── Reset button ── */
+  .reset-btn {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink-3);
+    background: none;
+    border: 1px solid var(--rule);
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Noto Sans SC', sans-serif;
+    transition: border-color .2s, color .2s;
+  }
+  .reset-btn:hover { border-color: var(--ink-3); color: var(--ink-2); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .item {
+    animation: fadeUp .4s ease both;
+  }
+
+  .item:nth-child(1)  { animation-delay: .05s; }
+  .item:nth-child(2)  { animation-delay: .10s; }
+  .item:nth-child(3)  { animation-delay: .15s; }
+  .item:nth-child(4)  { animation-delay: .20s; }
+  .item:nth-child(5)  { animation-delay: .25s; }
+  .item:nth-child(6)  { animation-delay: .30s; }
+  .item:nth-child(7)  { animation-delay: .35s; }
+  .item:nth-child(8)  { animation-delay: .40s; }
+  .item:nth-child(9)  { animation-delay: .45s; }
+  .item:nth-child(10) { animation-delay: .50s; }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    .page { padding: 40px 18px 60px; }
+    .title { font-size: 22px; }
+    .item { padding: 14px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <p class="eyebrow">美本申请 · 活动列表自查</p>
+    <h1 class="title">你的活动列表，<br>会让招生官<em>记住你</em>吗？</h1>
+    <p class="subtitle">10个问题，帮你判断活动列表有没有在悄悄扣分。逐条点击勾选，诚实回答"是"才算通过。</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span class="progress-count" id="pcount">已完成 0 / 10</span>
+      <span class="progress-pct" id="ppct"></span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="pfill"></div>
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="section-label">
+    <span class="tag tag-desc">描述质量</span>
+    <span class="section-line"></span>
+    <span class="section-label-text">每一条写的是什么</span>
+  </div>
+
+  <div class="item" onclick="toggle(this,1)">
+    <div class="item-num"><span class="item-num-text">1</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">每条描述里有具体数字吗？</p>
+      <p class="item-hint">「服务了5000人」「教了30个朋友」，比「帮助了很多人」有说服力十倍。没有数字，影响力就是虚的。</p>
+    </div>
+  </div>
+
+  <div class="item" onclick="toggle(this,2)">
+    <div class="item-num"><span class="item-num-text">2</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">描述的是你带来的影响，而不只是你做了什么事？</p>
+      <p class="item-hint">「组织了20场演出」是事情。「帮助社区筹款6000元，封控期间服务400名师生」是影响。招生官想看后者。</p>
+    </div>
+  </div>
+
+  <div class="item" onclick="toggle(this,3)">
+    <div class="item-num"><span class="item-num-text">3</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">你的角色和职责写清楚了吗？</p>
+      <p class="item-hint">「核心成员」和「创始人 / 社长」给招生官的感受天壤之别。不要用模糊的头衔掩盖你真实的贡献。</p>
+    </div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section-label">
+    <span class="tag tag-order">整体排序</span>
+    <span class="section-line"></span>
+    <span class="section-label-text">10条放在一起看</span>
+  </div>
+
+  <div class="item" onclick="toggle(this,4)">
+    <div class="item-num"><span class="item-num-text">4</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">陌生人看完10条，能用几个词说出你是什么样的人吗？</p>
+      <p class="item-hint">如果答案是「什么都有，但不知道他真正喜欢什么」——这是活动列表最大的问题，比任何单条描述的措辞都更致命。</p>
+    </div>
+  </div>
+
+  <div class="item" onclick="toggle(this,5)">
+    <div class="item-num"><span class="item-num-text">5</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">第一条是你最有说服力的活动，而不只是「看起来最高大上」的活动？</p>
+      <p class="item-hint">排序代表你自己认为的重要性。把真正能说明「你是谁」的活动放在最前面，而不是把苏麦克数学夏校随手压在第六位。</p>
+    </div>
+  </div>
+
+  <div class="item" onclick="toggle(this,6)">
+    <div class="item-num"><span class="item-num-text">6</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">活动类型有一定多样性，不是清一色的竞赛和研究？</p>
+      <p class="item-hint">学术、领导力、社区贡献、艺术体育……多种类型组合，才能勾勒出一个立体的人，而不是一台竞赛机器。</p>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section-label">
+    <span class="tag tag-logic">逻辑一致</span>
+    <span class="section-line"></span>
+    <span class="section-label-text">经不经得起推敲</span>
+  </div>
+
+  <div class="item" onclick="toggle(this,7)">
+    <div class="item-num"><span class="item-num-text">7</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">你填的时间投入（每周小时数、持续周数）和描述的成果相符吗？</p>
+      <p class="item-hint">声称做了两年实地调研，但描述只有一句话——招生官会用逻辑推理你，时间和成果对不上，可信度就崩了。</p>
+    </div>
+  </div>
+
+  <div class="item" onclick="toggle(this,8)">
+    <div class="item-num"><span class="item-num-text">8</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">你的核心活动和申请专业方向之间，有可以解释的逻辑关系？</p>
+      <p class="item-hint">不要求每条都相关，但如果前面的活动全指向数学，你却申请了工程和计算机，招生官会困惑你真正的热爱是什么。</p>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section-label">
+    <span class="tag tag-match">与文书的关系</span>
+    <span class="section-line"></span>
+    <span class="section-label-text">整体 package 是否呼应</span>
+  </div>
+
+  <div class="item" onclick="toggle(this,9)">
+    <div class="item-num"><span class="item-num-text">9</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">你在 PS 里花笔墨写的重要经历，在活动列表里有对应吗？</p>
+      <p class="item-hint">PS 里大篇幅描述的事，活动列表里找不到——招生官会觉得哪里对不上，开始怀疑真实性。</p>
+    </div>
+  </div>
+
+  <div class="item" onclick="toggle(this,10)">
+    <div class="item-num"><span class="item-num-text">10</span><span class="item-num-check">✓</span></div>
+    <div class="item-body">
+      <p class="item-q">整个列表，至少有 1—2 条体现了你对他人或社区的贡献？</p>
+      <p class="item-hint">顶校想招「让世界变得更好的人」。如果10条全是自我提升，没有一条朝外，这条逻辑线会缺失。</p>
+    </div>
+  </div>
+
+  <!-- Score -->
+  <div class="score-card" id="scoreCard">
+    <p class="score-label" id="scoreLabel">诊断结果</p>
+    <p class="score-title" id="scoreTitle">逐条勾选，完成后查看你的结果</p>
+    <p class="score-body" id="scoreBody">请诚实作答——只有你确定能回答「是」的，才算通过。</p>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">↺ 重新开始</button>
+
+  <footer class="footer">
+    <p class="footer-note">活动列表只是文书 package 的一部分。如果你想知道招生官第一眼看到你的列表会有什么印象，<strong>欢迎私信我，发给我看看。</strong></p>
+    <p class="footer-note" style="color: var(--ink-4);">本清单基于真实申请案例整理，供参考使用。</p>
+  </footer>
+
+</div>
+
+<script>
+  var checked = 0;
+  var total = 10;
+  var states = {};
+
+  function toggle(el, n) {
+    var wasChecked = el.classList.contains('checked');
+    el.classList.toggle('checked');
+    if (wasChecked) { checked = Math.max(0, checked - 1); }
+    else { checked++; }
+    updateProgress();
+    updateScore();
+  }
+
+  function updateProgress() {
+    var pct = Math.round(checked / total * 100);
+    document.getElementById('pfill').style.width = pct + '%';
+    document.getElementById('pcount').textContent = '已完成 ' + checked + ' / ' + total;
+    document.getElementById('ppct').textContent = checked > 0 ? pct + '%' : '';
+  }
+
+  function updateScore() {
+    var card  = document.getElementById('scoreCard');
+    var label = document.getElementById('scoreLabel');
+    var title = document.getElementById('scoreTitle');
+    var body  = document.getElementById('scoreBody');
+
+    card.className = 'score-card';
+
+    if (checked === 0) {
+      label.textContent = '诊断结果';
+      title.textContent = '逐条勾选，完成后查看你的结果';
+      body.textContent  = '请诚实作答——只有你确定能回答「是」的，才算通过。';
+      return;
+    }
+
+    var miss = total - checked;
+
+    if (checked === total) {
+      card.classList.add('green');
+      label.textContent = '10 / 10 · 基本过关';
+      title.textContent = '活动列表在逻辑层面没有明显漏洞';
+      body.textContent  = '但「没有坑」和「让人记住你」之间还有距离。活动描述的措辞、排序的微调，都可能影响招生官的第一印象。如果想让我帮你做一次冷眼诊断，欢迎私信把列表发给我看。';
+    } else if (checked >= 7) {
+      card.classList.add('yellow');
+      label.textContent = checked + ' / 10 · 有几处值得打磨';
+      title.textContent = '基本过关，但还有 ' + miss + ' 个问题需要检查';
+      body.textContent  = '你已经注意到了大部分关键点，剩下的 ' + miss + ' 条可能正在悄悄影响招生官的印象。这些细节在 Top 20 的竞争里往往是关键差距。';
+    } else if (checked >= 4) {
+      card.classList.add('yellow');
+      label.textContent = checked + ' / 10 · 有不少坑需要填';
+      title.textContent = '活动列表大概率在给你减分';
+      body.textContent  = '还有 ' + miss + ' 个问题没有通过。高中三年的投入值得被更好地呈现出来——建议认真重新梳理一遍，至少把前5条的描述精打细磨。';
+    } else {
+      card.classList.add('red');
+      label.textContent = checked + ' / 10 · 需要重做';
+      title.textContent = '招生官第一眼可能就会失去兴趣';
+      body.textContent  = '目前通过了 ' + checked + ' 条，还有 ' + miss + ' 个核心问题待解决。活动列表是招生官在看 PS 之前形成第一印象的地方，这部分的打磨值得花认真的时间。';
+    }
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.item.checked').forEach(function(el) {
+      el.classList.remove('checked');
+    });
+    checked = 0;
+    updateProgress();
+    updateScore();
+  }
+</script>
+</body>
+</html>
